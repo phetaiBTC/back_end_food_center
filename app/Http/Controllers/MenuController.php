@@ -10,10 +10,44 @@ class MenuController extends Controller
     /**
      * 📌 ดึงรายการเมนูทั้งหมด
      */
-    public function getAll()
-    {
-        return response()->json(Menu::all());
+    public function getall(Request $request)
+{
+    // Validate that category_id is either provided or not
+    $validated = $request->validate([
+        'category_id' => 'nullable|integer|exists:categories,id', // category_id is optional but must be valid if provided
+    ]);
+
+    // If category_id is provided, fetch menus for that category; otherwise, fetch all menus
+    if ($validated['category_id']) {
+        $menus = Menu::where('category_id', $validated['category_id'])->with('category')->get();
+    } else {
+        $menus = Menu::with('category')->get(); // Fetch all menus with their categories
     }
+
+    // Check if menus exist
+    if ($menus->isEmpty()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'No menus found.'
+        ], 404);
+    }
+
+    // Return the menus with success status, including category name
+    return response()->json([
+        'success' => true,
+        'data' => $menus->map(function ($menu) {
+            return [
+                'id' => $menu->id,
+                'name' => $menu->name,
+                'description' => $menu->description,
+                'image' => $menu->image,
+                'price' => $menu->price,
+                'category_name' => $menu->category->name, // Adding category name
+                'category_id' => $menu->category_id,
+            ];
+        })
+    ], 200);
+}
 
     /**
      * 🛒 สร้างเมนูใหม่
@@ -26,6 +60,7 @@ class MenuController extends Controller
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'category_id' => 'required|exists:categories,id',
         ]);
         $imagePath = null;
         if ($request->hasFile('image')) {
@@ -37,6 +72,7 @@ class MenuController extends Controller
             'price' => $request->price,
             'description' => $request->description,
             'image' => $imagePath,
+            'category_id' => $request->category_id,
         ]);
 
         return response()->json([
@@ -98,4 +134,3 @@ class MenuController extends Controller
         return response()->json(['message' => 'Menu deleted successfully!']);
     }
 }
-

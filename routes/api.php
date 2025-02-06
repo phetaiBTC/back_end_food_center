@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
@@ -53,5 +54,12 @@ Route::get('/email/verify/{token}', [AuthController::class, 'verify'])->name('ve
         Route::get('/{id}', [OrderController::class, 'getOne'])->name('getone');
         Route::put('/{id}', [OrderController::class, 'update'])->name('update');
         Route::delete('/{id}', [OrderController::class, 'delete'])->name('delete');
+    });
+    Route::prefix('category')->name('category.')->group(function () {
+        Route::get('/getall', [CategoriesController::class, 'getall'])->name('getall');
+        Route::get('/{id}', [CategoriesController::class, 'getOne'])->name('getone');
+        Route::post('/create', [CategoriesController::class, 'create'])->name('create');
+        Route::post('/update/{id}', [CategoriesController::class, 'update'])->name('update');
+        Route::delete('/{id}', [CategoriesController::class, 'delete'])->name('delete');
     });
 // });
