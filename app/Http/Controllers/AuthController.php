@@ -24,7 +24,7 @@ class AuthController extends Controller
         if (!$token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
-        return response()->json(['token' => 'Bearer '.$token], 200);
+        return response()->json(['token' => $token], 200);
     }
     public function register(register $request)
     {

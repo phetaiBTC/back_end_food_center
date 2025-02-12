@@ -9,10 +9,28 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    /**
-     * 🛒 สร้างคำสั่งซื้อใหม่
-     */
-    public function store(Request $request)
+    public function getAll(Request $request)
+    {
+        $orders = Order::with('items')->get();
+        return response()->json($orders);
+    }
+    public function getAllUser(Request $request)
+    {
+        $query = Order::with(['user', 'items.menu']);
+
+        // ถ้ามีการส่ง user_id มา ให้กรองเฉพาะของ user นั้น
+        if ($request->has('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        $orders = $query->get();
+
+        return response()->json($orders);
+    }
+
+
+
+    public function create(Request $request)
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
@@ -24,7 +42,6 @@ class OrderController extends Controller
 
         $totalPrice = 0;
 
-        // สร้างคำสั่งซื้อใหม่
         $order = Order::create([
             'user_id' => $request->user_id,
             'vendor_id' => $request->vendor_id,
@@ -55,19 +72,6 @@ class OrderController extends Controller
             'order' => $order->load('items'),
         ], 201);
     }
-
-    /**
-     * 📌 ดึงรายการคำสั่งซื้อทั้งหมด
-     */
-    public function index()
-    {
-        $orders = Order::with('items')->get();
-        return response()->json($orders);
-    }
-
-    /**
-     * 🔍 ดึงรายละเอียดคำสั่งซื้อเฉพาะ ID
-     */
     public function show($id)
     {
         $order = Order::with('items')->find($id);
@@ -100,11 +104,7 @@ class OrderController extends Controller
             'order' => $order,
         ]);
     }
-
-    /**
-     * ❌ ลบคำสั่งซื้อ
-     */
-    public function destroy($id)
+    public function delete($id)
     {
         $order = Order::find($id);
 

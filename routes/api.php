@@ -18,7 +18,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/email/verify/{token}', [AuthController::class, 'verify'])->name('verification.verify');
 
-// Route::middleware(['jwt.auth'])->group(function () {
+Route::middleware(['jwt.auth'])->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/tokenDetails', [AuthController::class, 'tokenDetails']);
@@ -43,16 +43,19 @@ Route::get('/email/verify/{token}', [AuthController::class, 'verify'])->name('ve
         Route::post('/update/{id}', [MenuController::class, 'update'])->name('update');
         Route::delete('/{id}', [MenuController::class, 'delete'])->name('delete');
     });
-    Route::prefix('order-item')->name('orderitem.')->group(function () {
+    Route::prefix('orderitem')->name('orderitem.')->group(function () {
         Route::post('/create', [OrderItemController::class, 'create'])->name('create');
         Route::get('/{order_id}', [OrderItemController::class, 'getOrderItems'])->name('getOrderItems');
         Route::put('/{id}', [OrderItemController::class, 'update'])->name('update');
-        Route::delete('/{id}', [OrderItemController::class, 'delete'])->name('delete');
+        Route::delete('/{id}', [OrderItemController::class, 'destroy'])->name('delete');
     });
     Route::prefix('order')->name('order.')->group(function () {
+        Route::get('/getallorder', [OrderController::class, 'getAll'])->name('getall');
+        Route::get('/getallorderuser', [OrderController::class, 'getAllUser'])->name('getallUser');
         Route::post('/create', [OrderController::class, 'create'])->name('create');
-        Route::get('/{id}', [OrderController::class, 'getOne'])->name('getone');
+        Route::get('/{id}', [OrderController::class, 'show'])->name('getone');
         Route::put('/{id}', [OrderController::class, 'update'])->name('update');
+        Route::put('/status/{id}', [OrderController::class, 'updateStatus'])->name('updateStatus');
         Route::delete('/{id}', [OrderController::class, 'delete'])->name('delete');
     });
     Route::prefix('category')->name('category.')->group(function () {
@@ -62,4 +65,4 @@ Route::get('/email/verify/{token}', [AuthController::class, 'verify'])->name('ve
         Route::post('/update/{id}', [CategoriesController::class, 'update'])->name('update');
         Route::delete('/{id}', [CategoriesController::class, 'delete'])->name('delete');
     });
-// });
+});

@@ -44,6 +44,7 @@ class MenuController extends Controller
                 'price' => $menu->price,
                 'category_name' => $menu->category->name, // Adding category name
                 'category_id' => $menu->category_id,
+                'rating' => 5
             ];
         })
     ], 200);
@@ -71,7 +72,7 @@ class MenuController extends Controller
             'name' => $request->name,
             'price' => $request->price,
             'description' => $request->description,
-            'image' => $imagePath,
+            'image' => 'http://127.0.0.1:8000/storage/'.$imagePath,
             'category_id' => $request->category_id,
         ]);
 
@@ -81,9 +82,6 @@ class MenuController extends Controller
         ], 201);
     }
 
-    /**
-     * 🔍 ดึงข้อมูลเมนูตาม ID
-     */
     public function getOne($id)
     {
         $menu = Menu::find($id);
